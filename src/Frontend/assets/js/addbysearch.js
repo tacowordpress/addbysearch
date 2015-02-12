@@ -459,4 +459,4 @@
       array_addbysearch = [];
     },
   }
-})(jQuery)
+})(jQuery);
