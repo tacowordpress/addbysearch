@@ -1,6 +1,6 @@
 <?php
 /*
- * Add By Search
+ * AddBySearch
  * Description: Add related posts by searching
  */
 
