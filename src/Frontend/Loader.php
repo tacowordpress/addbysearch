@@ -23,8 +23,12 @@ class Loader
      */
     public static function isViewingHTMLPage()
     {
-        if (!is_admin()) return false;
-        if (!array_key_exists('SCRIPT_NAME', $_SERVER)) return false;
+        if (!is_admin()) {
+            return false;
+        }
+        if (!array_key_exists('SCRIPT_NAME', $_SERVER)) {
+            return false;
+        }
         
         $whitelisted_script_names = array(
             '/wp-admin/post-new.php',
@@ -43,7 +47,8 @@ class Loader
      * Get an array of namespaces this file resides in
      * @return array
      */
-    public static function getNameSpaceArray() {
+    public static function getNameSpaceArray()
+    {
         return array_reverse(explode('\\', __NAMESPACE__));
     }
 
@@ -55,8 +60,8 @@ class Loader
      */
     public static function getContentType($file_name)
     {
-        $file_extension = strtolower(substr(strrchr($file_name,"."), 1));
-        switch($file_extension) {
+        $file_extension = strtolower(substr(strrchr($file_name, "."), 1));
+        switch ($file_extension) {
             case "gif": return "image/gif";
             case "png": return "image/png";
             case "jpeg":
@@ -76,14 +81,14 @@ class Loader
      */
     public static function getAssetFolderName($file_name)
     {
-        $file_extension = strtolower(substr(strrchr($file_name,"."), 1));
-        if(preg_match('/jpg|jpeg|gif|png/', $file_extension)) {
+        $file_extension = strtolower(substr(strrchr($file_name, "."), 1));
+        if (preg_match('/jpg|jpeg|gif|png/', $file_extension)) {
             return 'img';
         }
-        if($file_extension === 'js') {
+        if ($file_extension === 'js') {
             return 'js';
         }
-        if($file_extension === 'css') {
+        if ($file_extension === 'css') {
             return 'css';
         }
         return false;
@@ -94,11 +99,16 @@ class Loader
      * Determine the path for an asset using the query string
      * @return string bool
      */
-    public static function getAssetPath() {
+    public static function getAssetPath()
+    {
         $url_frags = parse_url($_SERVER['REQUEST_URI']);
-        if (!array_key_exists('query', $url_frags)) return false;
+        if (!array_key_exists('query', $url_frags)) {
+            return false;
+        }
         parse_str($url_frags['query'], $query_vars);
-        if (!array_key_exists('asset', $query_vars)) return false;
+        if (!array_key_exists('asset', $query_vars)) {
+            return false;
+        }
         $folder_name = self::getAssetFolderName($query_vars['asset']);
         $file_name = sprintf(
             dirname(__FILE__).'/assets/%s/%s',
@@ -106,7 +116,7 @@ class Loader
             $query_vars['asset']
         );
         if (file_exists($file_name)) {
-           return $file_name;
+            return $file_name;
         }
         return $false;
     }
@@ -119,12 +129,18 @@ class Loader
      */
     public static function fileServe($query)
     {
-        if (!array_key_exists('REQUEST_URI', $_SERVER)) return $query;
+        if (!array_key_exists('REQUEST_URI', $_SERVER)) {
+            return $query;
+        }
         $folder_plugin_namespace = Str::machine(next(self::getNameSpaceArray()));
-        if (!preg_match("/addons\/$folder_plugin_namespace\/assets\/(.*)$/", $_SERVER['REQUEST_URI'])) return $query;
+        if (!preg_match("/addons\/$folder_plugin_namespace\/assets\/(.*)$/", $_SERVER['REQUEST_URI'])) {
+            return $query;
+        }
 
         $file_name = self::getAssetPath();
-        if (!$file_name) return $query;
+        if (!$file_name) {
+            return $query;
+        }
 
         $content_type = self::getContentType($file_name);
         header('Content-type: ' . $content_type);
