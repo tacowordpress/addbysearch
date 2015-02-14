@@ -4,7 +4,7 @@
   "description": "This plugin allows for post ordering and assigning of relationships to other posts by searching.",
   "license": "MIT",
   "minimum-stability": "dev",
-  "keywords": ["wordpress", "custom post type", "post ordering", "term ordering", "taco", "tacowordpress"],
+  "keywords": ["wordpress", "custom post type", "post ordering", "term ordering", "taco", "tacowordpress", "addbysearch", "autocomplete", "search"],
   "version": "1.0.0",
   "require": {
     "php": ">=5.2.7"
