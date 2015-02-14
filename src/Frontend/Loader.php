@@ -148,6 +148,5 @@ class Loader
         http_response_code(200);
         readfile($file_name);
         exit;
-        return $query;
     }
 }
