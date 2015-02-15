@@ -1,1 +1,331 @@
-hello
+<!doctype html>
+<html lang="" class="docs">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>AddBySearch</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="lib/foundation/foundation-5.5.0/css/normalize.css">
+<link rel="stylesheet" href="lib/foundation/foundation-5.5.0/css/foundation.min.css">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<!-- masthead -->
+<div class="container masthead">
+  <div class="row">
+    <div class="columns small-12 medium-9">
+      <h3><a href="http://tacowordpress.github.io/tacowordpress" target="_blank">Taco</a> Addons</h3>
+      <h2>AddBySearch Docs</h2>
+    </div>
+  </div>
+</div>
+
+<!-- content -->
+<div class="container content">
+  <div class="row">
+    <div class="columns small-12 medium-3 sidebar">
+      <ul class="side-nav">
+        <li class="heading">Getting Started</li>
+        <li><a href="#what_is_addbysearch">What is AddBySearch?</a></li>
+        <li><a href="#installation">Installation</a></li>
+        <li><a href="#dependencies">Dependencies</a></li>
+        <li><a href="https://github.com/tacowordpress/addbysearch" target="_blank">View on Github</a></li>
+        <li><a href="http://tacowordpress.github.io/tacowordpress/" target="_blank">Visit the Taco homepage</a></li>
+
+        <li class="divider"></li>
+
+        <li class="heading">Making it Work</li>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#ordering">Custom Post Ordering</a></li>
+        <li><a href="#autocomplete">Autocomplete</a></li>
+        <li class="divider"></li>
+        <li class="heading">Using it in templates</li>
+        <li><a href="#templates">The template code</a></li>
+        <li class="divider"></li>
+        <li class="heading">Advanced Options</li>
+        <li><a href="#custom_methods">Defining your own methods</a></li>
+
+        <li class="divider"></li>
+
+        <li class="heading">Other</li>
+        <li><a href="#license">License</a></li>
+      </ul>
+    </div>
+
+    <div class="columns small-12 medium-9">
+
+<a name="what_is_taco"></a>
+<h2>What is AddBySearch?</h2>
+<p>AddBySearch is a Taco add-on that allows you to easily assign relationships to other posts as well as assign an order.</p>
+<h4>What else?</h4>
+<p>For instance, you have a custom post type of "Employee" and another of "Emergency Contact", each with their own respective fields. What if you wanted to assign many emergency contacts to an employee? This could be done straight from code, but this would require hardcoding and assigning relationships by "ID" which has no meaning. This is no task for someone without any knowledge of code.</p>
+
+<p>
+ <b>It's also fair to say this plugin has other great features included in the UI. Here's a quick breakdown.</b>
+</p>
+<ul>
+  <li>
+    Add posts by searching or showing all of a post type that you choose to show.
+  </li>
+  <li>
+    Order posts the way you want by an easy to use drag-n-drop interface.
+  </li>
+  <li>
+    Delete a post that has a relationship. Don't worry, you're covered.<br> It will automatically be removed from any relationships.
+  </li>
+  <li>
+    What if you just want the ordering mechanism? There is a setting just for this.
+  </li>
+  <li>
+    If you need to limit the value to one, you can do that too.
+  </li>
+ </ul>
+
+
+<hr>
+<a name="installation"></a>
+<h2>Installation</h2>
+<p><a href="http://getcomposer.org">Composer</a> is the preferred method for installing AddBySearch. In order to install AddBySearch, you must first install Taco. Go here for more information:<br><a href="http://tacowordpress.github.io/tacowordpress#getting-started" target="_blank">Taco Installation instructions</a></p>
+<p>Add the below to your composer file.</p>
+
+<pre class="prettyprint prettyprinted"><span class="pun">{</span><span class="pln">
+  </span><span class="str">"require"</span><span class="pun">:</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    </span><span class="str">"tacowordpress/addbysearch"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"dev-master"</span><span class="pln">
+  </span><span class="pun">}</span><span class="pln">
+</span><span class="pun">}</span></pre>
+
+<p>In your functions.php file, make sure to initialize Taco followed by AddBySearch.</p>
+<p class="filename">wordpress/wp-content/your-theme/functions.php</p>
+<pre class="prettyprint prettyprinted"><span class="com">// Initialize Taco</span><span class="pln">
+\Taco\Loader</span><span class="pun">::</span><span class="pln">init</span><span class="pun">();</span>
+<span class="pln">
+<span class="com">// Initialize AddBySearch</span><span class="pln">
+\AddBySearch\Loader</span><span class="pun">::</span><span class="pln">init</span><span class="pun">();</span></pre>
+
+</pre>
+
+<hr>
+<a name="dependencies"></a>
+<h2>Dependencies</h2>
+<p>For your own sanity and security, you&rsquo;re hopefully running PHP&nbsp;>=&nbsp;5.4 and WordPress&nbsp;>=&nbsp;4.0. But if not, Taco works as far back as:</p>
+<ul>
+  <li>Taco >= 0.2.3</li>
+  <li>WordPress >= 3.3</li>
+  <li>PHP >= 5.3</li>
+</ul>
+
+<hr>
+
+<a name="setup"></a>
+<h2>Setup</h2>
+<h3>Defining a custom field as an addbysearch field</h3>
+<p>This plugin relies on Taco (Custom Posts) and is configured through the getFields method.</p>
+<p>Here&#039;s how to use it.</p>
+<pre class="prettyprint">
+&lt;?php
+/*
+Plugin Name: Employee
+Version: 1.0
+Description: Employee Post Type
+*/
+
+class Employee extends \Taco\Post
+{
+  public function getFields() {
+    return array(
+      'employee_friends' => array(
+        'type' => 'text',
+        'class' => 'addbysearch',
+        'data-post-type' => 'Employee'
+      )
+    );
+  }
+}
+
+</pre>
+<p>The above code will ouput an autocomplete search seen in the next section below.</p>
+
+<hr>
+
+<a name="autocomplete"></a>
+<h2>Using the Autocomplete Search</h2>
+<img src="img/addbysearch-autocomplete-search.png">
+<h3>Limiting the field to accepting only one value.</h3>
+<p>just use: <code>'data-single-value'=> true</code></p>
+<p>This will prevent admin users from picking more values from the list until they remove what's already there.</p>
+<pre class="prettyprint">
+&lt;?php
+
+public function getFields()
+{
+  return array(
+    'employee_boss' => array(
+      'type' => 'text',
+      'class' => 'addbysearch',
+      'data-post-type' => 'Employee',
+      'data-single-value' => true
+    )
+  );
+}
+</pre>
+
+<hr>
+
+<a name="ordering"></a>
+<h2>Ordering Posts</h2>
+<p>In many cases you may just want the ordering mechanism. The addition of <code>'data-order-only' => true</code> makes this possible.</p>
+<pre class="prettyprint">
+&lt;?php
+/*
+Plugin Name: Employee
+Version: 1.0
+Description: Employee Post Type
+*/
+
+class Employee extends \Taco\Post
+{
+  public function getFields() {
+    return array(
+      'employee_friends' => array(
+        'type' => 'text',
+        'class' => 'addbysearch',
+        'data-post-type' => 'Employee',
+        'data-order-only' => true
+      )
+    );
+  }
+}
+</pre>
+
+<img src="img/addbysearch-ordering.png">
+
+<hr>
+
+<a name="templates"></a>
+<h2>Using AddBySearch in your template</h2>
+<pre class="prettyprint">
+&lt;?php
+
+global $post;
+// load the current post (post type of department)
+$department = \Taco\Post\Factory::create($post);
+
+// get the department's list of employees that have been custom picked and ordered by the admin
+$employees = \AddBySearch::getPostsFromOrder(
+  $department->get('employees')
+);
+
+if(Arr::iterable($employees)) {
+  foreach($employees as $employee) {
+    echo $employee->getTheTitle();
+  }
+}
+</pre>
+<h3>Args for the method \AddBySearch::getPostsFromOrder() </b><br></h3>
+<code>
+AddBySearch::getPostsFromOrder(
+  $string_order = '',
+  $reverse = true,
+  $is_term = false,
+  $taxonomy = null
+)
+</code>
+
+<h4>Explanation of arguments</h4>
+<ul>
+  <li>
+    <b>$string_order String</b>
+    <em>A comma seperated list of post ids</em>
+  </li>
+  <li>
+    <b>$reverse Bool</b>
+    <em>Should the list of posts be reversed?</em>
+  </li>
+  <li>
+    <b>$is_term Bool</b>
+    <em>Are we getting a taxonomy term instead of a post?</em>
+  </li>
+  <li>
+    <b>$taxonomy String</b>
+    <em>If the last argument was set to true, then this argument is the taxonomy to use.</em>
+  </li>
+</ul>
+
+<hr>
+
+
+<a name="custom_methods"></a>
+<h2>Defining your own methods.</h2>
+<p>
+  At some point, you may want the data to be filtered differently in the results that show up.
+  For instance. What if you want to show employees under the taxonomy "employee-type" that are assigned the term "human-resources"?
+</p>
+
+<pre class="prettyprint">
+&lt;?php
+/*
+Plugin Name: Department
+Version: 1.0
+Description: Department Post Type
+*/
+
+class Department extends TacoPost
+{
+  
+  public function getFields() {
+    return array(
+      'employees_human_resources' => array(
+        'type' => 'text',
+        'class' => 'addbysearch',
+        'data-post-type' => 'Department::getHumanResourcesEmployeePairs',
+        'data-order-only' => true
+      )
+    );
+  }
+
+  public function getHumanResourcesEmployeesPairs() {
+    $employees = (new Employee)->getByTerm('employee-type', 'human-resources');
+    return array_combine(
+      Collection::pluck($employees, 'ID'),
+      Collection::pluck($employees, 'post_title')
+    );
+  }
+}
+</pre>
+
+<p>The above is just short example, but I think you get the idea.</p>
+<p><b>Note:</b> When using a custom method for getting posts, make sure it returns an array where the key is the post id and the value is a descriptor such as the title.</p>
+
+<hr>
+
+<a name="license"></a>
+<h2>License</h2>
+<p>AddBySearch is open source software released under the MIT License. You can <a href="https://github.com/tacowordpress/addbysearch">View&nbsp;AddBySearch&nbsp;on&nbsp;GitHub</a> to view the license information and to contribute to the project.</p>
+
+    </div>
+  </div>
+</div>
+
+<!-- footer -->
+<footer class="container">
+  <div class="row">
+    <div class="columns small-12">
+      <p>AddBySearch is open source software under the MIT license.
+      <br><a href="#">View on GitHub</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?autoload=true&skin=sunburst"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="lib/jquery/jquery-2.1.3.min.js"><\/script>')</script>
+<script src="lib/foundation/foundation-5.5.0/js/foundation.min.js"></script>
+</body>
+</html>
+
+
+
+
+  
