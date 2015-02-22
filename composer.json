@@ -7,9 +7,7 @@
   "keywords": ["wordpress", "custom post type", "post ordering", "term ordering", "taco", "tacowordpress", "addbysearch", "autocomplete", "search"],
   "version": "1.0.1",
   "require": {
-    "php": ">=5.2.7"
-  },
-  "require-dev": {
+    "php": ">=5.2.7",
     "jasand-pereza/frontend-loader" : "dev-master"
   },
   "autoload": {
