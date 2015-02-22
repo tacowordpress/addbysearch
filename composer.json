@@ -1,6 +1,6 @@
 {
   "name": "tacowordpress/addbysearch",
-  "type": "vcs",
+  "type": "library",
   "description": "This plugin allows for post ordering and assigning of relationships to other posts by searching.",
   "license": "MIT",
   "minimum-stability": "dev",
