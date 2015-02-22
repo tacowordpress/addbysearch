@@ -9,7 +9,7 @@
   "require": {
     "php": ">=5.2.7"
   },
-  "require": {
+  "require-dev": {
     "jasand-pereza/frontend-loader" : "dev-master"
   },
   "autoload": {
