@@ -9,15 +9,6 @@
   "require": {
     "php": ">=5.2.7"
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/jasand-pereza/frontend-loader.git"
-    }
-  ],
-  "require": {
-    "jasand-pereza/frontend-loader" : "dev-master"
-  },
   "autoload": {
     "psr-4": {
       "AddBySearch\\": "src/"
