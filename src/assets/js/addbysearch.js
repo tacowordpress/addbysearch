@@ -45,7 +45,7 @@
     ordering_text: 'Order by dragging the items below.',
     single_value_text: '– Pick only one.',
     single_value: false,
-    path_file: '/wp-content/plugins/addbysearch/',
+    path_file: '/addons/addbysearch/assets/',
 
     init: function() {
       var $input = this.$input_original;
@@ -194,7 +194,7 @@
 
 
     getMoveIconTemplate: function() {
-      return '<img src="' + this.path_file + 'icon-move.png">';
+      return '<img src="' + this.path_file + '?asset=icon-move.png">';
     },
 
 
