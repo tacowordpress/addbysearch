@@ -8,7 +8,7 @@
   "version": "1.0.1",
   "require": {
     "php": ">=5.2.7",
-    "jasand-pereza/frontend-loader" : ">=1.0.0"
+    "jasand-pereza/frontend-loader" : "dev-master"
   },
   "autoload": {
     "psr-4": {
