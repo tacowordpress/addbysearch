@@ -9,11 +9,6 @@
   "require": {
     "php": ">=5.2.7"
   },
-  "autoload": {
-    "psr-4": {
-      "AddBySearch\\": "src/"
-    }
-  },
   "repositories": [
     {
       "type": "vcs",
@@ -21,6 +16,11 @@
     }
   ],
   "require": {
-    "frontend-loader" : "dev-master"
+    "jasand-pereza/frontend-loader" : "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "AddBySearch\\": "src/"
+    }
   }
 }
