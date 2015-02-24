@@ -45,6 +45,7 @@ class addbysearch
           $post = \Taco\Post\Factory::create($post);
           $fields = $post->getFields();
           $array_of_json_results = array();
+          $inc = 0;
           foreach ($fields as $k => $v) {
               if (array_key_exists('data-post-type', $fields[$k])) {
                   list($class, $method) = self::getPostTypeStructure($fields[$k]);
@@ -66,7 +67,8 @@ class addbysearch
                       $post->save();
                   }
 
-                  $array_of_json_results['json_results_'.strtolower($class)] = $pairs;
+                  $array_of_json_results['json_results_'.strtolower($class).'_'.$inc] = $pairs;
+                  $inc++;
               }
           }
           if (Arr::iterable($array_of_json_results)) {

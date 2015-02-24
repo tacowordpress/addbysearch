@@ -3,13 +3,19 @@
 
      if($('.addbysearch').length) {
       var array_addbysearch = [];
+      var inc = 0;
       $('.addbysearch').each(function() {
         var post_type = $(this).data('postType').toLowerCase();
         if(!$(this).prop('placeholder').length) {
           $(this).attr('placeholder', 'search by keyword');
         }
         post_type = post_type.split('::')[0];
-        array_addbysearch.push(new addbysearch($(this), posts_json_results['json_results_'+post_type]));
+        array_addbysearch.push(
+          new addbysearch(
+            $(this),
+            posts_json_results['json_results_' + post_type] + '_' + inc
+          )
+        );
       })
      }
   });
