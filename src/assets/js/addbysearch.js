@@ -13,7 +13,7 @@
         array_addbysearch.push(
           new addbysearch(
             $(this),
-            posts_json_results['json_results_' + post_type] + '_' + inc
+            posts_json_results['json_results_' + post_type + '_' + inc]
           )
         );
       })
