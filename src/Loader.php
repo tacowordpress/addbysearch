@@ -5,7 +5,7 @@ class Loader
 {
     public static function init()
     {
-        add_action('admin_footer', 'AddBySearch\AddBySearch::init');
+        add_action('admin_footer', '\AddBySearch\AddBySearch::init');
         add_filter('parse_query', function($query) {
           
           $front_end_loader = new FrontendLoader(
