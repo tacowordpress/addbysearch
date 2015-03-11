@@ -16,7 +16,7 @@ use Taco\Util\Obj as Obj;
 use Taco\Util\Str as Str;
 
 
-class addbysearch
+class AddBySearch
 {
   public static $array_post_type_object_names;
 
