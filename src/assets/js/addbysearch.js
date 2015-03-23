@@ -16,6 +16,7 @@
             posts_json_results['json_results_' + post_type + '_' + inc]
           )
         );
+        inc++;
       })
      }
   });
