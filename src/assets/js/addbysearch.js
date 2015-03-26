@@ -1,7 +1,7 @@
 (function($){
   $(function() {
 
-     if($('.addbysearch').length) {
+    if($('.addbysearch').length) {
       var array_addbysearch = [];
       var inc = 0;
       $('.addbysearch').each(function() {
@@ -17,8 +17,8 @@
           )
         );
         inc++;
-      })
-     }
+      });
+    }
   });
 
 
@@ -49,6 +49,7 @@
     acceptable_line_length: 65,
     using_terms: false,
     order_only: false,
+    disable_show_all: false,
     ordering_text: 'Order by dragging the items below.',
     single_value_text: '– Pick only one.',
     single_value: false,
@@ -70,7 +71,7 @@
 
       // add all field templates to the DOM
       $input.after(this.getActualValuesTemplate());
-      this.$actual_values_object = $input.siblings('.addbysearch-actual-values')
+      this.$actual_values_object = $input.siblings('.addbysearch-actual-values');
 
       this.$actual_values_object.before(this.getReverseButtonTemplate());
       this.$reverse_btn_object = this.$actual_values_object.parent().find('.reverse-saved');
@@ -90,6 +91,7 @@
 
       this.using_terms = $input.data('usingTerms');
       this.order_only = $input.data('orderOnly');
+      this.disable_show_all = $input.data('disableShowAll');
       this.single_value = $input.data('singleValue');
 
       // is this an order only
@@ -100,13 +102,25 @@
       if(this.single_value) {
         this.setDefaultsForSingleValue();
       }
+      // should we disable the show all button?
+      if(this.disable_show_all) {
+        this.disableShowAllButton();
+      }
+    },
+
+
+    disableShowAllButton: function() {
+      this.$addbysearch_show_all
+        .off('click')
+        .hide();
     },
 
 
     setDefaultsForSingleValue: function() {
       var $label_search = this.$addbysearch_show_all.parent().find('b:eq(0)');
       $label_search.text(
-      $label_search.text().replace(/Results/i, 'Results ' + this.single_value_text));
+        $label_search.text().replace(/Results/i, 'Results ' + this.single_value_text)
+      );
     },
 
 
@@ -138,7 +152,7 @@
       this.$input_original
         .parent()
         .find('b:visible')
-        .text(this.ordering_text)
+        .text(this.ordering_text);
     },
 
 
@@ -181,7 +195,7 @@
 
     getSingleResultTemplate: function(data_key, data_value) {
       var html  = '<li class="addbysearch-result postbox" data-key-id="' + data_key + '">';
-          html += '<span>' + this.getShortened(data_value) + '</span>'
+          html += '<span>' + this.getShortened(data_value) + '</span>';
           if(!this.using_terms) {
             html += this.getPreviewLink(data_key);
           }
@@ -221,7 +235,7 @@
 
 
     getIdsFieldTemplate: function() {
-      return '<input type="hidden" name="" value="">'
+      return '<input type="hidden" name="" value="">';
     },
 
 
@@ -301,7 +315,7 @@
 
     getArrayFromActualValues: function() {
       var values = [];
-      this.$actual_values_object.find('li').each(function(){
+      this.$actual_values_object.find('li').each(function() {
         values.push($(this).data('keyId'));
       });
       return values;
@@ -312,7 +326,7 @@
       var self = this;
       this.$ids_field_object.val(this.getArrayFromActualValues().reverse().join(','));
       this.$actual_values_object.find('li').each(function() {
-        self.$actual_values_object.prepend($(this))
+        self.$actual_values_object.prepend($(this));
       });
     },
 
@@ -324,7 +338,7 @@
         return;
       }
       this.$results_jquery_object.append(results.join(' '));
-      this.$results_jquery_object.find('li').each(function(){
+      this.$results_jquery_object.find('li').each(function() {
         $(this).append(self.getClickToAddText());
       })
       this.$actual_values_object.sortable();
@@ -359,11 +373,11 @@
       var $reverse_btn_object = this.$reverse_btn_object;
       this.getSavedResults();
 
-      $addbysearch_show_all.on('click', function(e){
+      $addbysearch_show_all.on('click', function(e) {
         e.preventDefault();
         self.showEverything();
       });
-      $reverse_btn_object.on('click', function(e){
+      $reverse_btn_object.on('click', function(e) {
         e.preventDefault();
         self.reverseOrder();
       });
@@ -372,9 +386,6 @@
         results = self.filterResults();
         self.clearResults();
         self.appendResults(results);
-      })
-      .on('blur', function(e) {
-
       })
       .on('keydown', function(e) {
         if(e.which === 13) {
@@ -406,7 +417,7 @@
         .find('.addbysearch-result')
         .css({
           opacity: 0.5
-        })
+        });
     },
 
 
@@ -415,7 +426,7 @@
         .find('.addbysearch-result')
         .css({
           opacity: 1
-        })
+        });
     },
 
 
@@ -429,7 +440,7 @@
       var timeout_animation = null;
       $object.addClass('just-added')
 
-      timeout_animation = setTimeout(function(){
+      timeout_animation = setTimeout(function() {
         $object.removeClass('just-added');
       }, 1000);
 
@@ -438,7 +449,7 @@
 
     addRemoveBoxes: function() {
       var self = this;
-      this.$actual_values_object.find('li').each(function(){
+      this.$actual_values_object.find('li').each(function() {
         if(!$(this).find('.button').length) {
           $(this).find('span').after(self.getRemoveButtonTemplate());
         }
