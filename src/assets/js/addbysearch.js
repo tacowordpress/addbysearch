@@ -1,39 +1,41 @@
 (function($){
   $(function() {
-
-    if($('.addbysearch').length) {
-      var array_addbysearch = [];
-      var inc = 0;
-      $('.addbysearch').each(function() {
-        var post_type = $(this).data('postType').toLowerCase();
-        if(!$(this).prop('placeholder').length) {
-          $(this).attr('placeholder', 'search by keyword');
-        }
-        post_type = post_type.split('::')[0];
-        array_addbysearch.push(
-          new addbysearch(
-            $(this),
-            posts_json_results['json_results_' + post_type + '_' + inc]
-          )
-        );
-        inc++;
-      });
+    
+    if($('.addbysearch').length === 0) {
+      return;
     }
+
+    var array_addbysearch = [];
+    var inc = 0;
+    $('.addbysearch').each(function() {
+      var post_type = $(this).data('postType').toLowerCase();
+      if(!$(this).prop('placeholder').length) {
+        $(this).attr('placeholder', 'search by keyword');
+      }
+      post_type = post_type.split('::')[0];
+      array_addbysearch.push(
+        new addbysearch(
+          $(this),
+          posts_json_results['json_results_' + post_type + '_' + inc]
+        )
+      );
+      inc++;
+    });
   });
 
 
   var addbysearch = function($object, data_src) {
     if(!data_src) return;
-    if(typeof data_src == 'object') {
+    if(typeof data_src === 'object') {
       this.data_obj = data_src;
     }
-    else if(typeof data_src == 'string') {
+    else if(typeof data_src === 'string') {
       this.data_src = data_src;
     }
-    if(this.data_obj == null && this.data_url == null) return;
+    if(this.data_obj === null && this.data_url === null) return;
     this.$input_original = $object;
     this.init();
-  }
+  };
 
 
   addbysearch.prototype = {
@@ -49,7 +51,6 @@
     acceptable_line_length: 65,
     using_terms: false,
     order_only: false,
-    disable_show_all: false,
     ordering_text: 'Order by dragging the items below.',
     single_value_text: '– Pick only one.',
     single_value: false,
@@ -91,7 +92,6 @@
 
       this.using_terms = $input.data('usingTerms');
       this.order_only = $input.data('orderOnly');
-      this.disable_show_all = $input.data('disableShowAll');
       this.single_value = $input.data('singleValue');
 
       // is this an order only
@@ -102,25 +102,13 @@
       if(this.single_value) {
         this.setDefaultsForSingleValue();
       }
-      // should we disable the show all button?
-      if(this.disable_show_all) {
-        this.disableShowAllButton();
-      }
-    },
-
-
-    disableShowAllButton: function() {
-      this.$addbysearch_show_all
-        .off('click')
-        .hide();
     },
 
 
     setDefaultsForSingleValue: function() {
       var $label_search = this.$addbysearch_show_all.parent().find('b:eq(0)');
       $label_search.text(
-        $label_search.text().replace(/Results/i, 'Results ' + this.single_value_text)
-      );
+      $label_search.text().replace(/Results/i, 'Results ' + this.single_value_text));
     },
 
 
@@ -163,6 +151,7 @@
 
     appendNewResults: function() {
       var ids = this.getDiffFromValuesToResults();
+      var i;
       for(i in ids) {
         $('[data-key-id="' + ids[i] + '"]').click();
       }
@@ -174,8 +163,9 @@
       var results_value_keys = Object.keys(this.data_obj);
       var diff = [];
       
+      var i;
       for(i in results_value_keys) {
-        if(actual_value_keys.indexOf(parseInt(results_value_keys[i])) == -1) {
+        if(actual_value_keys.indexOf(parseInt(results_value_keys[i], 10)) === -1) {
           diff.push(results_value_keys[i]);
         }
       }
@@ -240,11 +230,10 @@
 
 
     getShortened: function(text) {
-      return (text.length >= this.acceptable_line_length)
-        ? text.substring(
-          0,
-          (text.length - (text.length - this.acceptable_line_length))) + '...'
-        : text;
+      if (text.length >= this.acceptable_line_length) {
+        return text.substring(0, (text.length - (text.length - this.acceptable_line_length))) + '...';
+      }
+      return text;
     },
 
 
@@ -257,6 +246,7 @@
       var organized_data = [];
       var saved_ids = self.$input_original.val().split(',').reverse();
 
+      var s;
       for(s in saved_ids) {
           $(this.getSingleResultTemplate(
             saved_ids[s],
@@ -283,6 +273,7 @@
       var $input = this.$input_original;
       var data = this.data_obj;
       input_text = $input.val().toLowerCase().trim();
+      var d;
       for(d in data) {
         if(input_text.length < 3) return;
         var current_data = data[d].toLowerCase().trim();
@@ -298,6 +289,7 @@
     showEverything: function() {
       var data = this.data_obj;
       var results = [];
+      var d;
       for(d in data) {
         results.push(this.getSingleResultTemplate(d, data[d]));
       }
@@ -315,7 +307,7 @@
 
     getArrayFromActualValues: function() {
       var values = [];
-      this.$actual_values_object.find('li').each(function() {
+      this.$actual_values_object.find('li').each(function(){
         values.push($(this).data('keyId'));
       });
       return values;
@@ -338,9 +330,9 @@
         return;
       }
       this.$results_jquery_object.append(results.join(' '));
-      this.$results_jquery_object.find('li').each(function() {
+      this.$results_jquery_object.find('li').each(function(){
         $(this).append(self.getClickToAddText());
-      })
+      });
       this.$actual_values_object.sortable();
       this.$actual_values_object.on('sortupdate', function(event, ui) {
         self.updateSavedValues();
@@ -373,11 +365,11 @@
       var $reverse_btn_object = this.$reverse_btn_object;
       this.getSavedResults();
 
-      $addbysearch_show_all.on('click', function(e) {
+      $addbysearch_show_all.on('click', function(e){
         e.preventDefault();
         self.showEverything();
       });
-      $reverse_btn_object.on('click', function(e) {
+      $reverse_btn_object.on('click', function(e){
         e.preventDefault();
         self.reverseOrder();
       });
@@ -386,6 +378,9 @@
         results = self.filterResults();
         self.clearResults();
         self.appendResults(results);
+      })
+      .on('blur', function(e) {
+
       })
       .on('keydown', function(e) {
         if(e.which === 13) {
@@ -408,7 +403,7 @@
           // temp disable adding anymore until actual values length is zero
           self.addDisabledAppereance();
         }
-      })
+      });
     },
 
 
@@ -438,9 +433,9 @@
 
     flashAddition: function($object) {
       var timeout_animation = null;
-      $object.addClass('just-added')
+      $object.addClass('just-added');
 
-      timeout_animation = setTimeout(function() {
+      timeout_animation = setTimeout(function(){
         $object.removeClass('just-added');
       }, 1000);
 
@@ -449,7 +444,7 @@
 
     addRemoveBoxes: function() {
       var self = this;
-      this.$actual_values_object.find('li').each(function() {
+      this.$actual_values_object.find('li').each(function(){
         if(!$(this).find('.button').length) {
           $(this).find('span').after(self.getRemoveButtonTemplate());
         }
@@ -476,5 +471,5 @@
       this.$input_original.closest('.inside').html(this.original_state.contents());
       array_addbysearch = [];
     },
-  }
+  };
 })(jQuery);
