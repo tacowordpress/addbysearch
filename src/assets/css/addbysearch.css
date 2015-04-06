@@ -1,6 +1,6 @@
 .addbysearch-results {
   clear: both;
-  width: 100%;
+  width: 95%;
   height: 0;
   overflow-y: scroll;
   -webkit-transition: all 100ms ease .4s;
@@ -9,11 +9,14 @@
   transition: all 500ms ease .4s;
 }
 .addbysearch-results.contains-results {
+  box-sizing: border-box;
+  margin-top: 0;
+  padding: 10px;
   height: 200px;
+  border: 1px solid #666;
 }
 .addbysearch-result {
   cursor: pointer;
-  width: 95%;
   height: 28px;
   margin-bottom: 5px;
   padding-left: 10px;
