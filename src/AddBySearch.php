@@ -66,7 +66,7 @@ class AddBySearch
                       $post->save();
                   }
 
-                  $array_of_json_results['json_results_'.strtolower($class).'_'.$inc] = $pairs;
+                  $array_of_json_results[$k] = $pairs;
                   $inc++;
               }
           }

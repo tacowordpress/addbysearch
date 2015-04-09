@@ -3,7 +3,6 @@
 
     if($('.addbysearch').length) {
       var array_addbysearch = [];
-      var inc = 0;
       $('.addbysearch').each(function() {
         var post_type = $(this).data('postType').toLowerCase();
         if(!$(this).prop('placeholder').length) {
@@ -13,10 +12,9 @@
         array_addbysearch.push(
           new addbysearch(
             $(this),
-            posts_json_results['json_results_' + post_type + '_' + inc]
+            posts_json_results[$(this).attr('name')]
           )
         );
-        inc++;
       });
     }
   });
