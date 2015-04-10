@@ -70,6 +70,7 @@ class AddBySearch
               }
           }
           if (Arr::iterable($array_of_json_results)) {
+              // save it for later when the front-end gets loaded
               self::$posts_json_object = json_encode($array_of_json_results);
               return true;
           }
@@ -172,8 +173,8 @@ class AddBySearch
   }
 
 
-  // Get default JavaScript for this plugin
-  public static function getJs()
+  // Load JavaScript and CSS
+  public static function loadClientSide()
   {
       if (!self::$should_load_frontend) {
           return false;
