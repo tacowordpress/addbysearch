@@ -17,15 +17,16 @@ use Taco\Util\Str as Str;
 
 class AddBySearch
 {
-  public static $array_post_type_object_names;
+  public static $should_load_frontend = false;
+  public static $posts_json_object = null;
 
-    public static function init()
-    {
-        self::$array_post_type_object_names = array();
-        if (self::getPostsData()) {
-            self::getJs();
-        }
-    }
+  public static function init()
+  {
+      if (self::getPostsData()) {
+          self::$should_load_frontend = true;
+          return;
+      }
+  }
 
   /**
    * Get json encoded data to used in Frontend
@@ -33,6 +34,7 @@ class AddBySearch
   public static function getPostsData()
   {
       global $post;
+
       if (!$post) {
           return false;
       }
@@ -41,10 +43,9 @@ class AddBySearch
       }
       $class = str_replace(' ', '', ucwords(str_replace(Base::SEPARATOR, ' ', $post->post_type)));
       if (class_exists($class)) {
-          $post = \Taco\Post\Factory::create($post);
-          $fields = $post->getFields();
+          $custom_post = \Taco\Post\Factory::create($post);
+          $fields = $custom_post->getFields();
           $array_of_json_results = array();
-          $inc = 0;
           foreach ($fields as $k => $v) {
               if (array_key_exists('data-post-type', $fields[$k])) {
                   list($class, $method) = self::getPostTypeStructure($fields[$k]);
@@ -55,49 +56,48 @@ class AddBySearch
                   $posts_helper = new $class;
                   // must be in the format of "id => title"
                   $pairs = $posts_helper->$method();
-                  $existing_pairs = self::getExistingPairs($pairs, explode(',', $post->get($k)));
+                  $existing_pairs = self::getExistingPairs($pairs, explode(',', $custom_post->get($k)));
                   $existing_ids = array_keys($existing_pairs);
 
                   if (!Arr::iterable($existing_ids)) {
-                      $post->set($k, '');
-                      $post->save();
+                      $custom_post->set($k, '');
+                      $custom_post->save();
                   } else {
-                      $post->set($k, join(',', $existing_ids));
-                      $post->save();
+                      $custom_post->set($k, join(',', $existing_ids));
+                      $custom_post->save();
                   }
-
                   $array_of_json_results[$k] = $pairs;
-                  $inc++;
               }
           }
           if (Arr::iterable($array_of_json_results)) {
-              echo '<script> var posts_json_results='.json_encode($array_of_json_results).'</script>';
+              self::$posts_json_object = json_encode($array_of_json_results);
               return true;
           }
+          return false;
       }
   }
 
 
-    private function getExistingPairs($pairs, $ids)
-    {
-        $existing_pairs = array();
-        foreach ($ids as $id) {
-            if (array_key_exists($id, $pairs)) {
-                $existing_pairs[$id] = $pairs[$id];
-            }
-        }
-        return $existing_pairs;
-    }
+  private function getExistingPairs($pairs, $ids)
+  {
+      $existing_pairs = array();
+      foreach ($ids as $id) {
+          if (array_key_exists($id, $pairs)) {
+              $existing_pairs[$id] = $pairs[$id];
+          }
+      }
+      return $existing_pairs;
+  }
 
 
-    private function getPostTypeStructure($field)
-    {
-        $post_type_structure = explode('::', $field['data-post-type']);
-        if (count($post_type_structure) === 1) {
-            $post_type_structure[] = 'getPairs';
-        }
-        return $post_type_structure;
-    }
+  private function getPostTypeStructure($field)
+  {
+      $post_type_structure = explode('::', $field['data-post-type']);
+      if (count($post_type_structure) === 1) {
+          $post_type_structure[] = 'getPairs';
+      }
+      return $post_type_structure;
+  }
 
 
   // If the class doesn't exist, hide the addbysearch field
@@ -118,24 +118,24 @@ class AddBySearch
       global $wpdb;
       if ($is_term) {
           $results = $wpdb->get_results(
-        sprintf(
-          "SELECT `term_id`
-           FROM `%s`",
-          $wpdb->terms
-        ),
-        ARRAY_A
-      );
+              sprintf(
+                  "SELECT `term_id`
+                   FROM `%s`",
+                  $wpdb->terms
+              ),
+              ARRAY_A
+          );
           $ids = Collection::pluck($results, 'term_id');
       } else {
           $results = $wpdb->get_results(
-        sprintf(
-          "SELECT `ID`
-           FROM `%s`
-           WHERE `post_status` = 'publish'",
-          $wpdb->posts
-        ),
-        ARRAY_A
-      );
+              sprintf(
+                  "SELECT `ID`
+                   FROM `%s`
+                   WHERE `post_status` = 'publish'",
+                   $wpdb->posts
+              ),
+              ARRAY_A
+          );
           $ids = Collection::pluck($results, 'ID');
       }
       return array_intersect($ids_array, $ids);
@@ -175,13 +175,17 @@ class AddBySearch
   // Get default JavaScript for this plugin
   public static function getJs()
   {
-      $types = self::$array_post_type_object_names;
-      echo '<script>var array_post_type_object_names ='.json_encode($types).'</script>';
+      if (!self::$should_load_frontend) {
+          return false;
+      }
+
+      echo '<script> var posts_json_results='.self::$posts_json_object.'</script>';
 
       wp_register_style('addbysearch_styles', '/addons/addbysearch/assets/?asset=addbysearch.css');
       wp_enqueue_style('addbysearch_styles');
 
       wp_register_script('addbysearch_js', '/addons/addbysearch/assets/?asset=addbysearch.js');
       wp_enqueue_script('addbysearch_js');
+      return;
   }
 }
