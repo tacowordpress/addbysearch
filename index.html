@@ -224,7 +224,7 @@
       $department = \Taco\Post\Factory::create($post);
 
       // get the department's list of employees that have been custom picked and ordered by the admin
-      $employees = \AddBySearch::getPostsFromOrder(
+      $employees = \AddBySearch\AddBySearch::getPostsFromOrder(
         $department->get('employees')
       );
 
