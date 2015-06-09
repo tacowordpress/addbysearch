@@ -55,6 +55,10 @@
 
     init: function() {
       var $input = this.$input_original;
+
+      // fix width issues of parent td in some cases
+      $input.closest('td').css('width', '90%');
+
       var input_name = $input.attr('name');
 
       // get original contents and store it to a variable
