@@ -60,11 +60,9 @@ class AddBySearch
                   $existing_ids = array_keys($existing_pairs);
 
                   if (!Arr::iterable($existing_ids)) {
-                      $custom_post->set($k, '');
-                      $custom_post->save();
+                    	update_post_meta($custom_post->ID, $k, '');
                   } else {
-                      $custom_post->set($k, join(',', $existing_ids));
-                      $custom_post->save();
+                  		update_post_meta($custom_post->ID, $k, join(',', $existing_ids));
                   }
                   $array_of_json_results[$k] = $pairs;
               }
