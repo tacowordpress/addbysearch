@@ -147,9 +147,10 @@ class AddBySearch
    * @param bool $reverse should the collection be reversed
    * @param bool $is_term should the method return terms instead of posts
    * @param string $taxonomy if this method is returning terms, what taxonomy do they belong to
+   * @param bool $load_terms should terms be loaded with posts
    * @return array
    */
-  public static function getPostsFromOrder($string_order = '', $reverse = false, $is_term = false, $taxonomy = null)
+  public static function getPostsFromOrder($string_order = '', $reverse = false, $is_term = false, $taxonomy = null, $load_terms = true)
   {
       if (!strlen($string_order)) {
           return array();
@@ -160,7 +161,7 @@ class AddBySearch
       $ids_array = explode(',', trim(strip_tags($string_order)));
       if (!$is_term) {
           $ids_array = self::getItemsIfExists($ids_array, $is_term);
-          $items = \Taco\Post\Factory::createMultiple($ids_array);
+          $items = \Taco\Post\Factory::createMultiple($ids_array, $load_terms);
       } else {
           $ids_array = self::getItemsIfExists($ids_array, true);
           $items = \Taco\Term\Factory::createMultiple($ids_array, $taxonomy);
