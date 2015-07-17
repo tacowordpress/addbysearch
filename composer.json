@@ -8,7 +8,7 @@
   "version": "0.0.7",
   "require": {
     "php": ">=5.2.7",
-    "jasand-pereza/frontend-loader": "@dev"
+    "jasand-pereza/frontend-loader": "dev-custom-paths"
   },
   "autoload": {
     "psr-4": {
