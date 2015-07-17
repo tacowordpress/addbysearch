@@ -178,10 +178,10 @@ class AddBySearch
       $types = self::$array_post_type_object_names;
       echo '<script>var array_post_type_object_names ='.json_encode($types).'</script>';
 
-      wp_register_style('addbysearch_styles', '/addons/addbysearch/assets/?asset=addbysearch.css');
+      wp_register_style('addbysearch_styles', '/addons/addbysearch/assets/css/addbysearch.css');
       wp_enqueue_style('addbysearch_styles');
 
-      wp_register_script('addbysearch_js', '/addons/addbysearch/assets/?asset=addbysearch.js');
+      wp_register_script('addbysearch_js', '/addons/addbysearch/assets/js/addbysearch.js');
       wp_enqueue_script('addbysearch_js');
   }
 }
