@@ -28,10 +28,10 @@
     else if(typeof data_src == 'string') {
       this.data_src = data_src;
     }
-    if(this.data_obj == null && this.data_url == null) return;
+    if(this.data_obj === null && this.data_url === null) return;
     this.$input_original = $object;
     this.init();
-  }
+  };
 
 
   addbysearch.prototype = {
@@ -161,7 +161,7 @@
 
     appendNewResults: function() {
       var ids = this.getDiffFromValuesToResults();
-      for(i in ids) {
+      for(var i in ids) {
         $('[data-key-id="' + ids[i] + '"]').click();
       }
     },
@@ -172,7 +172,7 @@
       var results_value_keys = Object.keys(this.data_obj);
       var diff = [];
       
-      for(i in results_value_keys) {
+      for(var i in results_value_keys) {
         if(actual_value_keys.indexOf(parseInt(results_value_keys[i])) == -1) {
           diff.push(results_value_keys[i]);
         }
@@ -255,7 +255,7 @@
       var organized_data = [];
       var saved_ids = self.$input_original.val().split(',').reverse();
 
-      for(s in saved_ids) {
+      for(var s in saved_ids) {
           $(this.getSingleResultTemplate(
             saved_ids[s],
             data[saved_ids[s]]
@@ -281,7 +281,7 @@
       var $input = this.$input_original;
       var data = this.data_obj;
       input_text = $input.val().toLowerCase().trim();
-      for(d in data) {
+      for(var d in data) {
         if(input_text.length < 3) return;
         var current_data = data[d].toLowerCase().trim();
         if(data[d].toLowerCase().search(input_text) > -1) {
@@ -296,7 +296,7 @@
     showEverything: function() {
       var data = this.data_obj;
       var results = [];
-      for(d in data) {
+      for(var d in data) {
         results.push(this.getSingleResultTemplate(d, data[d]));
       }
       this.$results_jquery_object.find('li').remove();
@@ -338,7 +338,7 @@
       this.$results_jquery_object.append(results.join(' '));
       this.$results_jquery_object.find('li').each(function() {
         $(this).append(self.getClickToAddText());
-      })
+      });
       this.$actual_values_object.sortable();
       this.$actual_values_object.on('sortupdate', function(event, ui) {
         self.updateSavedValues();
@@ -406,7 +406,7 @@
           // temp disable adding anymore until actual values length is zero
           self.addDisabledAppereance();
         }
-      })
+      });
     },
 
 
@@ -436,7 +436,7 @@
 
     flashAddition: function($object) {
       var timeout_animation = null;
-      $object.addClass('just-added')
+      $object.addClass('just-added');
 
       timeout_animation = setTimeout(function() {
         $object.removeClass('just-added');
@@ -474,5 +474,5 @@
       this.$input_original.closest('.inside').html(this.original_state.contents());
       array_addbysearch = [];
     },
-  }
+  };
 })(jQuery);
