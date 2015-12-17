@@ -10,7 +10,7 @@ Docs: http://tacowordpress.github.io/addbysearch/
 
         {
           "require": {
-            "tacowordpress/tacowordpress: "dev-master"
+            "tacowordpress/tacowordpress: "dev-master",
             "tacowordpress/addbysearch": "dev-master"
           }
         }

@@ -29,7 +29,7 @@
 }
 .addbysearch-actual-values {
   clear: both;
-  width: 100%;
+  width: 95%;
   height: 150px;
   overflow-y: scroll;
 }
@@ -57,7 +57,7 @@
 }
 .reverse-saved.button {
   float: right;
-  margin-right: 20px;
+  margin-right: 34px;
   margin-top: 8px;
 }
 .addbysearch-actual-values li img {

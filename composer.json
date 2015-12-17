@@ -5,7 +5,7 @@
   "license": "MIT",
   "minimum-stability": "dev",
   "keywords": ["wordpress", "custom post type", "post ordering", "term ordering", "taco", "tacowordpress", "addbysearch", "autocomplete", "search"],
-  "version": "0.0.7",
+  "version": "0.1.4",
   "require": {
     "php": ">=5.2.7",
     "jasand-pereza/frontend-loader": "dev-custom-paths"
