@@ -41,6 +41,9 @@ class AddBySearch
       if (!array_key_exists('post_type', $post)) {
           return false;
       }
+      if (!preg_match('/post\.php|post-new\.php/', $_SERVER['SCRIPT_NAME'])) {
+          return false;
+      }
       $class = str_replace(' ', '', ucwords(str_replace(Base::SEPARATOR, ' ', $post->post_type)));
       if (class_exists($class)) {
           $custom_post = \Taco\Post\Factory::create($post);
