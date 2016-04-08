@@ -217,7 +217,7 @@
 
 
     getMoveIconTemplate: function() {
-      return '<img src="' + this.path_file + '?asset=icon-move.png">';
+      return '<img src="' + this.path_file + '/img/icon-move.png">';
     },
 
 
