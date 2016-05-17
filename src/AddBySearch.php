@@ -80,7 +80,7 @@ class AddBySearch
   }
 
 
-  private function getExistingPairs($pairs, $ids)
+  private static function getExistingPairs($pairs, $ids)
   {
       $existing_pairs = array();
       foreach ($ids as $id) {
@@ -92,7 +92,7 @@ class AddBySearch
   }
 
 
-  private function getPostTypeStructure($field)
+  private static function getPostTypeStructure($field)
   {
       $post_type_structure = explode('::', $field['data-post-type']);
       if (count($post_type_structure) === 1) {
