@@ -8,7 +8,7 @@
 
         // if the type is select, other filtering options are implied
         if($(this).attr('type') === 'select') {
-          $(this).parent('td').append('<input type="text">');
+          $(this).parent('td').append('<input style="float: right;" type="text">');
           $this = $(this).parent('td').find('input[type="text"]');
           var attributes = $(this).prop('attributes');
 
