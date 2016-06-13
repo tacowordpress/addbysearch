@@ -67,7 +67,11 @@ class AddBySearch
                   } else {
                   		update_post_meta($custom_post->ID, $k, join(',', $existing_ids));
                   }
-                  $array_of_json_results[$k] = $pairs;
+                  $pairs_formatted = [];
+                  foreach($pairs as $pitem_id => $pitem_title) {
+                    $pairs_formatted[] = ['ID' => $pitem_id, 'post_title' => $pitem_title];
+                  }
+                  $array_of_json_results[$k] = $pairs_formatted;
               }
           }
           if (Arr::iterable($array_of_json_results)) {
@@ -169,9 +173,66 @@ class AddBySearch
           $ids_array = self::getItemsIfExists($ids_array, true);
           $items = \Taco\Term\Factory::createMultiple($ids_array, $taxonomy);
       }
-    
+
       $items = ($reverse) ? array_reverse($items) : $items;
       return (Arr::iterable($items)) ? $items : array();
+  }
+
+
+  public static function AJAXSubmit()
+  {
+    if (array_key_exists('class_method', $_POST)) {
+        $params = array_key_exists('params', $_POST)
+            ? $_POST['params']
+            : null;
+        return self::callMethod($_POST['class_method'], $params);
+    }
+    return self::getJSONWithError('not_defined_class_method');
+  }
+
+
+  public static function getErrorMessage($error_key)
+  {
+    $errors = array(
+        'not_defined_class_method' => 'error: class and method not found'
+    );
+    return $errors[$error_key];
+  }
+
+
+  public static function getJSONWithError($error_key)
+  {
+      echo json_encode([
+          'success' => false,
+          'message' => self::getErrorMessage($error_key)
+      ]);
+      exit;
+  }
+
+
+  public static function callMethod($class_method, $params=null)
+  {
+      $class_method = '\\'.trim($class_method, '\\');
+      list($class, $method) = explode('::', $class_method);
+
+      if(!method_exists($class, $method)) {
+          return self::getJSONWithError('not_defined_class_method');
+      }
+      return self::formatDataAndReturnJSON($class::$method());
+  }
+
+
+  public static function formatDataAndReturnJSON($objects)
+  {
+      $order_fix_array = [];
+      foreach($objects as $k => $v) {
+        $order_fix_array[] = (object)[$k => $v];
+      }
+      echo json_encode([
+          'success' => true,
+          'posts' => $order_fix_array
+      ]);
+      exit;
   }
 
 
@@ -189,6 +250,18 @@ class AddBySearch
 
       wp_register_script('addbysearch_js', '/addons/addbysearch/assets/js/addbysearch.js');
       wp_enqueue_script('addbysearch_js');
+
+      // Allow this script to use admin-ajax.php
+      wp_localize_script(
+        'addbysearch_js',
+        'ADDBYSEARCH_AJAXSubmit',
+        array(
+          'ajaxurl' => admin_url('admin-ajax.php'),
+          'ADDBYSEARCH_AJAXSubmit_nonce' => wp_create_nonce(
+            'ADDBYSEARCH_AJAXSubmit-get'
+          )
+        )
+      );
       return;
   }
 }

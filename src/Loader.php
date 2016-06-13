@@ -1,6 +1,7 @@
 <?php
 namespace AddBySearch;
 use \FrontendLoader\FrontendLoader;
+
 class Loader
 {
     public static function init()
@@ -8,7 +9,7 @@ class Loader
         add_action('admin_head', '\AddBySearch\AddBySearch::init');
         add_action('admin_footer', '\AddBySearch\AddBySearch::loadClientSide');
         add_filter('parse_query', function($query) {
-          
+
           $front_end_loader = new FrontendLoader(
             'addons/addbysearch',
             dirname(__FILE__)
@@ -19,3 +20,8 @@ class Loader
         return true;
     }
 }
+
+add_action(
+  'wp_ajax_ADDBYSEARCH_AJAXSubmit',
+  '\AddBySearch\AddBySearch::AJAXSubmit'
+);

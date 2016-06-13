@@ -4,15 +4,31 @@
     if($('.addbysearch').length) {
       var array_addbysearch = [];
       $('.addbysearch').each(function() {
-        var post_type = $(this).data('postType').toLowerCase();
-        if(!$(this).prop('placeholder').length) {
-          $(this).attr('placeholder', 'search by keyword');
+        var $this = $(this);
+
+        // if the type is select, other filtering options are implied
+        if($(this).attr('type') === 'select') {
+          $(this).parent('td').append('<input type="text">');
+          $this = $(this).parent('td').find('input[type="text"]');
+          var attributes = $(this).prop('attributes');
+
+          $.each(attributes, function() {
+            if(this.name == 'options') return;
+            $this.attr(this.name, this.value);
+          });
+
+          $(this).removeAttr('name')
+            .addClass('addbysearch-select-filter');
+        }
+        var post_type = $this.data('postType').toLowerCase();
+        if(!$this.prop('placeholder').length) {
+          $this.attr('placeholder', 'search by keyword');
         }
         post_type = post_type.split('::')[0];
         array_addbysearch.push(
           new addbysearch(
-            $(this),
-            posts_json_results[$(this).attr('name')]
+            $this,
+            posts_json_results[$this.attr('name')]
           )
         );
       });
@@ -41,6 +57,8 @@
     $addbysearch_show_all: null,
     $ids_field_object: null,
     $reverse_btn_object: null,
+    $select_filter_object: null,
+    has_filtering_options: false,
     data_url: null,
     data_obj: null,
     original_state: null,
@@ -55,6 +73,13 @@
 
     init: function() {
       var $input = this.$input_original;
+
+      // does this have filtering options
+      this.has_filtering_options = ($input.siblings('.addbysearch-select-filter').length)
+        ? true
+        : false;
+
+      this.$select_filter_object = $input.siblings('.addbysearch-select-filter');
 
       // fix width issues of parent td in some cases
       $input.closest('td').css('width', '90%');
@@ -81,8 +106,14 @@
       $input.after(this.getResultsTemplate());
       this.$results_jquery_object = $input.siblings('.addbysearch-results');
 
-      $input.after(this.getShowAllButtonTemplate());
-      this.$addbysearch_show_all = $input.next('.addbysearch-show-all');
+      if(this.has_filtering_options) {
+        $input.after(this.getFilterBtnTemplate());
+        this.$addbysearch_filter_btn = $input.next('.addbysearch-filter-btn');
+      } else {
+        $input.after(this.getShowAllButtonTemplate());
+        this.$addbysearch_show_all = $input.next('.addbysearch-show-all');
+      }
+
 
       // initialize events
       this.initEvent();
@@ -175,7 +206,7 @@
       var actual_value_keys = this.getArrayFromActualValues();
       var results_value_keys = Object.keys(this.data_obj);
       var diff = [];
-      
+
       for(var i in results_value_keys) {
         if(actual_value_keys.indexOf(parseInt(results_value_keys[i])) == -1) {
           diff.push(results_value_keys[i]);
@@ -225,6 +256,9 @@
       return '<a href="#" class="addbysearch-show-all button">Show All</a>';
     },
 
+    getFilterBtnTemplate: function() {
+      return '<a href="#" class="addbysearch-filter-btn button">filter</a>';
+    },
 
     getReverseButtonTemplate: function() {
       return '<a href="#" class="reverse-saved button">Reverse order</a>';
@@ -249,6 +283,24 @@
         : text;
     },
 
+    getItemFromDataByID: function(ID) {
+      var item = null;
+      this.data_obj.forEach(function(d){
+        if(d.ID == ID) {
+          item = d;
+          return;
+        }
+      });
+      return item;
+    },
+
+    getItemTitleFromData: function(ID) {
+      var item = this.getItemFromDataByID(ID);
+      if(item.post_title !== 'undefined') {
+        return item.post_title;
+      }
+      return null;
+    },
 
     getSavedResults: function() {
       if(!this.data_obj) return;
@@ -260,12 +312,13 @@
       var saved_ids = self.$input_original.val().split(',').reverse();
 
       for(var s in saved_ids) {
-          $(this.getSingleResultTemplate(
-            saved_ids[s],
-            data[saved_ids[s]]
-
-          ))
-          .prependTo(this.$actual_values_object);
+        var post_title = this.getItemTitleFromData(saved_ids[s]);
+        if(post_title == null) continue;
+        $(this.getSingleResultTemplate(
+          saved_ids[s],
+          post_title
+        ))
+        .prependTo(this.$actual_values_object);
       }
       // add the remove button
       this.$actual_values_object.find('li span')
@@ -284,14 +337,15 @@
       var results = [];
       var $input = this.$input_original;
       var data = this.data_obj;
+      var self = this;
       input_text = $input.val().toLowerCase().trim();
-      for(var d in data) {
-        if(input_text.length < 3) return;
-        var current_data = data[d].toLowerCase().trim();
-        if(data[d].toLowerCase().search(input_text) > -1) {
-          results.push(this.getSingleResultTemplate(d, data[d]));
+      if(input_text.length < 3) return;
+      data.forEach(function(d){
+        var current_data = d.post_title.toLowerCase().trim();
+        if(d.post_title.toLowerCase().search(input_text) > -1) {
+          results.push(self.getSingleResultTemplate(d.ID, d.post_title));
         }
-      }
+      });
       return results;
     },
 
@@ -300,9 +354,10 @@
     showEverything: function() {
       var data = this.data_obj;
       var results = [];
-      for(var d in data) {
-        results.push(this.getSingleResultTemplate(d, data[d]));
-      }
+      var self = this;
+      data.forEach(function(d) {
+        results.push(self.getSingleResultTemplate(d.ID, d.post_title));
+      });
       this.$results_jquery_object.find('li').remove();
       this.appendResults(results);
       this.$results_jquery_object.addClass('contains-results');
@@ -373,12 +428,22 @@
       var $results_jquery_object = this.$results_jquery_object;
       var $addbysearch_show_all = this.$addbysearch_show_all;
       var $reverse_btn_object = this.$reverse_btn_object;
+      var $select_filter_object = this.$select_filter_object;
+      var $addbysearch_filter_btn = this.$addbysearch_filter_btn;
+
       this.getSavedResults();
 
-      $addbysearch_show_all.on('click', function(e) {
+      if(!this.has_filtering_options) {
+        $addbysearch_show_all.on('click', function(e) {
+          e.preventDefault();
+          self.showEverything();
+        });
+    } else {
+      $addbysearch_filter_btn.on('click', function(e) {
         e.preventDefault();
-        self.showEverything();
+        self.getFilteredPosts($(this).parent().find('select').val());
       });
+    }
       $reverse_btn_object.on('click', function(e) {
         e.preventDefault();
         self.reverseOrder();
@@ -423,7 +488,7 @@
     },
 
 
-    removeDisabledAppereance: function() {
+    removeDisabledAppearance: function() {
       this.$results_jquery_object
         .find('.addbysearch-result')
         .css({
@@ -468,7 +533,7 @@
         $(this).parent().remove();
         self.updateSavedValues();
         if(self.single_value && !self.countActualValues()) {
-          self.removeDisabledAppereance();
+          self.removeDisabledAppearance();
         }
       });
     },
@@ -478,5 +543,31 @@
       this.$input_original.closest('.inside').html(this.original_state.contents());
       array_addbysearch = [];
     },
+
+
+    updateData: function(data) {
+      this.data_obj[this.$input_original.attr('name')] = data;
+      this.showEverything();
+    },
+
+
+    getFilteredPosts: function(classMethod) {
+      var $ = jQuery;
+      var self = this;
+      $.ajax({
+        url: ADDBYSEARCH_AJAXSubmit.ajaxurl,
+        method: 'post',
+        dataType: 'json',
+        data: {
+          class_method: classMethod,
+          action: 'ADDBYSEARCH_AJAXSubmit',
+          ADDBYSEARCH_AJAXSubmit_nonce : ADDBYSEARCH_AJAXSubmit.ADDBYSEARCH_AJAXSubmit_nonce
+        }
+      }).then(function(d) {
+        if(d.success) {
+          self.updateData(d.posts);
+        }
+      });
+    }
   };
 })(jQuery);
