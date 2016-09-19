@@ -55,7 +55,8 @@
 .addbysearch ~ b {
   line-height: 40px;
 }
-.reverse-saved.button {
+.reverse-saved.button,
+.alphabetical-saved.button {
   float: right;
   margin-right: 34px;
   margin-top: 8px;
