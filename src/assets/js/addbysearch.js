@@ -41,6 +41,7 @@
     $addbysearch_show_all: null,
     $ids_field_object: null,
     $reverse_btn_object: null,
+    $alphabetical_btn_object: null,
     data_url: null,
     data_obj: null,
     original_state: null,
@@ -77,6 +78,9 @@
 
       this.$actual_values_object.before(this.getReverseButtonTemplate());
       this.$reverse_btn_object = this.$actual_values_object.parent().find('.reverse-saved');
+
+      this.$actual_values_object.before(this.getAlphabeticalButtonTemplate());
+      this.$alphabetical_btn_object = this.$actual_values_object.parent().find('.alphabetical-saved');
 
       $input.after(this.getResultsTemplate());
       this.$results_jquery_object = $input.siblings('.addbysearch-results');
@@ -142,6 +146,7 @@
       this.$input_original.hide();
       this.$results_jquery_object.hide();
       this.$reverse_btn_object.hide();
+      this.$alphabetical_btn_object.hide();
       this.$actual_values_object
         .parent()
         .find('.addbysearch-remove-btn')
@@ -227,9 +232,12 @@
 
 
     getReverseButtonTemplate: function() {
-      return '<a href="#" class="reverse-saved button">Reverse order</a>';
+      return '<a href="#" class="reverse-saved button">Reverse</a>';
     },
 
+    getAlphabeticalButtonTemplate: function() {
+      return '<a href="#" class="alphabetical-saved button">Alphabetical</a>';
+    },
 
     getClickToAddText: function() {
       return '<i>Click to Add</i>';
@@ -333,6 +341,40 @@
     },
 
 
+    alphabeticalOrder: function() {
+      var self = this;
+      
+      // Collect post_titles, sort them
+      var post_titles = [];
+      var post_ids_to_post_titles = [];
+      this.$actual_values_object.find('li').each(function() {
+        var post_id = parseInt($(this).attr('data-key-id'), 10);
+        var post_title = $(this).find('span').text().toLowerCase();
+
+        post_ids_to_post_titles[post_id] = post_title;
+        post_titles.push(post_title);
+      });
+      post_titles.sort();
+
+      // Match post_titles back to post_ids
+      // so that post_ids are sorted alphabetically by corresponding post_title
+      var post_ids_alphabetical = [];
+      $.each(post_titles, function(k, post_title) {
+        var post_id = post_ids_to_post_titles.indexOf(post_title);
+        post_ids_alphabetical.push(post_id);
+      });
+
+      // Apply to UI
+      this.$ids_field_object.val(post_ids_alphabetical.join(','));
+      for (var k in post_ids_alphabetical) {
+        var post_id_alphabetical = post_ids_alphabetical[k];
+
+        this.$actual_values_object.find('li[data-key-id="'+post_id_alphabetical+'"]').each(function() {
+          self.$actual_values_object.append($(this));
+        });
+      }
+    },
+
     appendResults: function(results) {
       var self = this;
       if(typeof results == 'undefined' || !results.length) {
@@ -373,6 +415,7 @@
       var $results_jquery_object = this.$results_jquery_object;
       var $addbysearch_show_all = this.$addbysearch_show_all;
       var $reverse_btn_object = this.$reverse_btn_object;
+      var $alphabetical_btn_object = this.$alphabetical_btn_object;
       this.getSavedResults();
 
       $addbysearch_show_all.on('click', function(e) {
@@ -382,6 +425,10 @@
       $reverse_btn_object.on('click', function(e) {
         e.preventDefault();
         self.reverseOrder();
+      });
+      $alphabetical_btn_object.on('click', function(e) {
+        e.preventDefault();
+        self.alphabeticalOrder();
       });
       $input.on('keyup', function(e) {
         var results;
