@@ -349,7 +349,7 @@
       var post_ids_to_post_titles = [];
       this.$actual_values_object.find('li').each(function() {
         var post_id = parseInt($(this).attr('data-key-id'), 10);
-        var post_title = $(this).find('span').text();
+        var post_title = $(this).find('span').text().toLowerCase();
 
         post_ids_to_post_titles[post_id] = post_title;
         post_titles.push(post_title);
