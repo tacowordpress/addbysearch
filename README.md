@@ -1,4 +1,8 @@
-# addbysearch
+# addbysearch (DEPRECATED)
+Please use tacowordpress/addmany for newer projects.
+https://github.com/tacowordpress/addmany
+
+
 AddBySearch is a Wordpress Taco add-on that allows you to easily assign relationships to other posts as well as order them. 
 
 Docs: http://tacowordpress.github.io/addbysearch/
